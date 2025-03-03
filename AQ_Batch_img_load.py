@@ -17,7 +17,7 @@ class ImportImgFilePath(bpy.types.Operator, ImportHelper):
 
     def execute(self, context):
         filepath = self.filepath
-        bpy.context.scene.AQ_props.AQ_Batch_imgfile_path = filepath
+        bpy.context.scene.AQ_Props.AQ_Batch_imgfile_path = filepath
 
         return {"FINISHED"}
 
@@ -32,13 +32,13 @@ class BatchImgLoad(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.context.scene.AQ_props.AQ_Batch_imgfile_path
+        return bpy.context.scene.AQ_Props.AQ_Batch_imgfile_path
 
     def execute(self, context):
         # 遍历文件夹中的所有图片文件
         global num
         for root, dirs, files in os.walk(
-            bpy.context.scene.AQ_props.AQ_Batch_imgfile_path
+            bpy.context.scene.AQ_Props.AQ_Batch_imgfile_path
         ):
             for file_name in files:
                 if file_name.endswith(
@@ -61,11 +61,11 @@ class RemoveFilePath(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
 
-        return bpy.context.scene.AQ_props.AQ_Batch_imgfile_path
+        return bpy.context.scene.AQ_Props.AQ_Batch_imgfile_path
 
     def execute(self, context):
 
-        bpy.context.scene.AQ_props.AQ_Batch_imgfile_path = ""
+        bpy.context.scene.AQ_Props.AQ_Batch_imgfile_path = ""
 
         return {"FINISHED"}
 
