@@ -51,7 +51,7 @@ class AQ_3DViewPanel(bpy.types.Panel):
         row.scale_y = 0.5
         row.label(text="网格编辑:", icon="MESH_DATA")
         row = box.row()
-        row.scale_y = 1.0
+        row.scale_y = 1
         row.prop(props, "Auto_Xray_Shading", text="自动打开透视模式")
         row = box.row()
         row.scale_y = 1.5
@@ -169,7 +169,7 @@ class ButtonAQGitHub(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        webbrowser.open("https://github.com/Estecsky/AQ-Toolkit")
+        webbrowser.open("https://github.com/Estecsky/AQ_Toolkit")
         return {"FINISHED"}
 
 
