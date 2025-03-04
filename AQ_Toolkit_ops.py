@@ -190,7 +190,7 @@ class ButtonLimitAndNormalizeAllWeights(bpy.types.Operator):
         limitValue = bpy.context.scene.AQ_props.AQ_limitWeightValue
         try:
             mesh = context.active_object
-            utils_limit_and_normalize_weights(mesh,limitValue)
+            utils_limit_and_normalize_weights(mesh, limitValue)
             self.report(
                 {"INFO"}, f"Weights normalized and limited to 4 groups per vetex."
             )
@@ -214,11 +214,11 @@ class ButtonReservedOneFace(bpy.types.Operator):
     def execute(self, context):
 
         active_obj = bpy.context.active_object
-
-        bpy.ops.object.select_all(action="DESELECT")
+        if bpy.context.object.mode == "OBJECT":
+            bpy.ops.object.select_all(action="DESELECT")
         active_obj.select_set(True)
         bpy.context.view_layer.objects.active = active_obj
-        
+
         bpy.ops.object.mode_set(mode="EDIT")
         bpy.ops.mesh.select_all(action="DESELECT")
         bpy.ops.mesh.select_mode(type="FACE")
@@ -246,13 +246,59 @@ class ButtonReservedOneFace(bpy.types.Operator):
         bmesh.update_edit_mesh(active_obj.data)
         bpy.ops.object.mode_set(mode="OBJECT")
         bpy.ops.object.mode_set(mode="EDIT")
-        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.select_all(action="SELECT")
 
+        if bpy.context.scene.AQ_Props.Auto_Xray_Shading:
+            if not is_xray_enabled():
+                bpy.ops.view3d.toggle_xray()
 
         return {"FINISHED"}
 
 
+class ButtonSelectSeams(bpy.types.Operator):
+    bl_idname = "select.aq_select_seams"
+    bl_label = "select_seams"
+    bl_description = "选中缝合边"
+
+    @classmethod
+    def poll(cls, context):
+        if bpy.context.active_object:
+            obj = bpy.context.active_object
+        else:
+            return False
+        return obj.type == "MESH"
+
+    def execute(self, context):
+        obj = bpy.context.active_object
+
+        if bpy.context.object.mode != "OBJECT":
+            bpy.ops.object.mode_set(mode="OBJECT")
+
+        bpy.ops.object.mode_set(mode="EDIT")
+        bpy.ops.mesh.select_mode(type="EDGE")
+        bpy.ops.mesh.select_all(action="DESELECT")
+
+        bm = bmesh.from_edit_mesh(obj.data)
+        bm.edges.ensure_lookup_table()
+
+        for e in bm.edges:
+            e.select = e.seam
+
+        bmesh.update_edit_mesh(obj.data)
+        return {"FINISHED"}
+
+
 # ----------Utils----------#
+
+
+def is_xray_enabled():
+    # 获取当前活动的 3D 视图空间
+    for area in bpy.context.screen.areas:
+        if area.type == "VIEW_3D":
+            for space in area.spaces:
+                if space.type == "VIEW_3D":
+                    return space.shading.show_xray
+    return False
 
 
 def split_faces_by_edge_seams(obj):  # Split mesh faces by seams
@@ -312,19 +358,28 @@ def utils_select_0_weight_vertices(mesh):
 
 
 # Limit and Normalize all vertex weights
-def utils_limit_and_normalize_weights(mesh,limitValue):
+def utils_limit_and_normalize_weights(mesh, limitValue):
     for vg in mesh.vertex_groups:
         # limit total weights
-        bpy.ops.object.vertex_group_limit_total(group_select_mode="ALL", limit=limitValue)
+        bpy.ops.object.vertex_group_limit_total(
+            group_select_mode="ALL", limit=limitValue
+        )
         # normalize all weights
         bpy.ops.object.vertex_group_normalize_all(
             group_select_mode="ALL", lock_active=False
         )
 
-classes =[ ButtonRemoveEmpty, ButtonRemoveUnusedBones, ButtonSplitMeshAlongUVs, 
-          ButtonDeleteLooseGeometry, ButtonSelect0WeightVertices, 
-          ButtonLimitAndNormalizeAllWeights, ButtonReservedOneFace]
 
+classes = [
+    ButtonRemoveEmpty,
+    ButtonRemoveUnusedBones,
+    ButtonSplitMeshAlongUVs,
+    ButtonDeleteLooseGeometry,
+    ButtonSelect0WeightVertices,
+    ButtonLimitAndNormalizeAllWeights,
+    ButtonReservedOneFace,
+    ButtonSelectSeams,
+]
 
 
 def register():
@@ -335,4 +390,3 @@ def register():
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
-
