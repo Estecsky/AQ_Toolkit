@@ -49,8 +49,10 @@ class AQ_3DViewPanel(bpy.types.Panel):
         )
         row = box.row()
         row.scale_y = 0.5
-
         row.label(text="网格编辑:", icon="MESH_DATA")
+        row = box.row()
+        row.scale_y = 1.0
+        row.prop(props, "Auto_Xray_Shading", text="自动打开透视模式")
         row = box.row()
         row.scale_y = 1.5
         row.operator("objectops.reserved_one_face", icon="MESH_DATA", text="保留一个面")
@@ -66,6 +68,9 @@ class AQ_3DViewPanel(bpy.types.Panel):
         row = box.row()
         row.scale_y = 1.5
         row.operator("panel_ops.remove_empty", icon="GROUP_VERTEX", text="移除空顶点组")
+        row = box.row()
+        row.scale_y = 1.4
+        row.operator("select.aq_select_seams", icon="EDGESEL", text="选中缝合边")
         row = box.row()
         row.scale_y = 1.4
         row.operator(
@@ -97,8 +102,6 @@ class AQ_BatchLoadImgUI(bpy.types.Panel):
         )
 
 
-
-
 class AQ_Toolkit_ExpandTools(bpy.types.Panel):
     global HD2_ExpandToolSwitch
     bl_order = 50
@@ -109,42 +112,35 @@ class AQ_Toolkit_ExpandTools(bpy.types.Panel):
     bl_category = "AQ_Toolkit"
     # bl_options = {"DEFAULT_CLOSED"}
 
-            
     # @classmethod
     # def poll(cls, context):
     #     return context.scene.expand_tools
 
-   
-
     def draw(self, context):
-        
-        #=================================
+
+        # =================================
         # 获取插件Prefs
-        #=================================
+        # =================================
         try:
             addon_prefs = AQ_PublicClass.get_addon_prefs()
             # 添加后续工具开关
             HD2_ExpandToolSwitch = addon_prefs.HD2ExpandTool
-            
-            
-            
-            
 
         except AttributeError as err:
-                HD2_ExpandToolSwitch = True
-                print(err)
-                print("没有找到插件偏好设置")
-                
-        #=======================
+            HD2_ExpandToolSwitch = True
+            print(err)
+            print("没有找到插件偏好设置")
+
+        # =======================
         # 绘制
-        #=======================
+        # =======================
         layout = self.layout
         box = layout.box()
         if HD2_ExpandToolSwitch:
             AQ_HellDivers2_ExpandTool.ExpandPanel(box)
         # if  某开关：
         #     绘制某工具面板函数
-            
+
         else:
             box.label(text="没有启用任何拓展工具，在插件偏好设置中开启")
 
