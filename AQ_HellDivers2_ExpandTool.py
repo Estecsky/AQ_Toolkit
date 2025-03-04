@@ -26,10 +26,17 @@ class ButtonDeleteMutilationMesh(bpy.types.Operator):
 
     def execute(self, context):
 
+        active_obj = bpy.context.active_object
         selected_objects = bpy.context.selected_objects
         deleted_num = 0
+        bpy.ops.object.select_all(action="DESELECT")
         for obj in selected_objects:
             if obj.type == "MESH":
+
+                obj.select_set(True)
+                bpy.ops.object.mode_set(mode="EDIT")
+                bpy.ops.mesh.select_all(action="DESELECT")
+                bpy.ops.object.mode_set(mode="OBJECT")
                 # 获取物体的所有材质槽
                 if len(obj.material_slots) == 0:
                     continue
@@ -43,24 +50,27 @@ class ButtonDeleteMutilationMesh(bpy.types.Operator):
                             bpy.ops.mesh.select_all(action="DESELECT")
 
                             # 选择目标材质的网格
-                            bpy.context.tool_settings.mesh_select_mode = (
-                                True,
-                                False,
-                                False,
+                            bpy.ops.mesh.select_mode(
+                                use_extend=False, use_expand=False, type="FACE"
                             )
+
                             bpy.ops.object.material_slot_select()
-                            # 删除选中的网格
+
                             bpy.ops.mesh.delete(type="VERT")
-                            bpy.ops.mesh.select_all(action='DESELECT')
+                            bpy.ops.mesh.select_all(action="DESELECT")
                             bpy.ops.object.mode_set(mode="OBJECT")
                             deleted_num += 1
+
+                obj.select_set(False)
             else:
                 continue
+        # 还原之前的所选状态
+        for obj in selected_objects:
+            obj.select_set(True)
+        # 还原激活物体
+        bpy.context.view_layer.objects.active = active_obj
 
-        if deleted_num == 0:
-            self.report({"WARNING"}, "没有找到需要删除的断肢网格")
-        else:
-            self.report({"INFO"}, "删除了{}个物体的断肢网格".format(deleted_num))
+        self.report({"INFO"}, "删除了{}个物体的断肢网格".format(deleted_num))
 
         return {"FINISHED"}
 
