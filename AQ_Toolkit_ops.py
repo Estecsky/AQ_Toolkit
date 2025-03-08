@@ -288,6 +288,56 @@ class ButtonSelectSeams(bpy.types.Operator):
         return {"FINISHED"}
 
 
+# Inspired by SilentNightSound#7430
+# Combines vertex groups with the same prefix into one
+class ButtonCombineVertexGroups(bpy.types.Operator):
+    bl_idname = "object.aq_combine_vertex_groups"
+    bl_label = "Combine Vertex Groups"
+    bl_description = "合并同前缀名的顶点组权重，从0开始，往后顺延（0，0.001，1，1.001，将分别合并为0，1两组）"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        obj = bpy.context.active_object
+        return obj.type == "MESH"
+
+    def execute(self, context):
+        props = bpy.context.scene.AQ_Props
+        vgroup_num = props.Comebine_vgroup_num
+        for num in range(0, vgroup_num + 1):
+            obj = bpy.context.active_object
+            relevant = [
+                x.name for x in obj.vertex_groups if x.name.split(".")[0] == f"{num}"
+            ]
+
+            vgroup = obj.vertex_groups.new(name=f"x{num}")
+
+            for vert_id, vert in enumerate(obj.data.vertices):
+                available_groups = [v_group_elem.group for v_group_elem in vert.groups]
+
+                combined = 0
+                for v in relevant:
+                    if obj.vertex_groups[v].index in available_groups:
+                        combined += obj.vertex_groups[v].weight(vert_id)
+
+                if combined > 0:
+                    vgroup.add([vert_id], combined, "ADD")
+
+            for vg in [
+                x for x in obj.vertex_groups if x.name.split(".")[0] == f"{num}"
+            ]:
+                obj.vertex_groups.remove(vg)
+
+            for vg in obj.vertex_groups:
+                if vg.name[0].lower() == "x":
+                    vg.name = vg.name[1:]
+
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.vertex_group_sort()
+
+        return {"FINISHED"}
+
+
 # ----------Utils----------#
 
 
@@ -379,6 +429,7 @@ classes = [
     ButtonLimitAndNormalizeAllWeights,
     ButtonReservedOneFace,
     ButtonSelectSeams,
+    ButtonCombineVertexGroups,
 ]
 
 

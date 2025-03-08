@@ -76,6 +76,17 @@ class AQ_3DViewPanel(bpy.types.Panel):
         row.operator(
             "misremove_unused.ops_bones", icon="BONE_DATA", text="删除未使用的骨骼"
         )
+        row = box.row()
+        row.scale_y = 0.5
+        row.label(text="顶点组权重合并:", icon="GROUP_VERTEX")
+        row = box.row()
+        row.scale_y = 1.0
+        row.prop(props, "Comebine_vgroup_num", text="合并组的编号")
+        row = box.row()
+        row.scale_y = 1.4
+        row.operator(
+            "object.aq_combine_vertex_groups", icon="CHECKMARK", text="合并顶点组权重"
+        )
 
 
 class AQ_BatchLoadImgUI(bpy.types.Panel):

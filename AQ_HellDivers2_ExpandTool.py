@@ -29,6 +29,7 @@ class ButtonDeleteMutilationMesh(bpy.types.Operator):
         active_obj = bpy.context.active_object
         selected_objects = bpy.context.selected_objects
         deleted_num = 0
+        bpy.ops.object.mode_set(mode="OBJECT")
         bpy.ops.object.select_all(action="DESELECT")
         for obj in selected_objects:
             if obj.type == "MESH":
@@ -36,31 +37,32 @@ class ButtonDeleteMutilationMesh(bpy.types.Operator):
                 obj.select_set(True)
                 bpy.ops.object.mode_set(mode="EDIT")
                 bpy.ops.mesh.select_all(action="DESELECT")
-                bpy.ops.object.mode_set(mode="OBJECT")
                 # 获取物体的所有材质槽
                 if len(obj.material_slots) == 0:
                     continue
-                for index, slot in enumerate(obj.material_slots):
-                    if slot.material:
-                        # 获取材质名称
-                        mat_name = slot.material.name
-                        if mat_name.startswith("12070197922454493211"):
-                            obj.active_material_index = index
-                            bpy.ops.object.mode_set(mode="EDIT")
-                            bpy.ops.mesh.select_all(action="DESELECT")
+                else:
+                    for index, slot in enumerate(obj.material_slots):
+                        if slot.material:
+                            # 获取材质名称
+                            mat_name = slot.material.name
+                            if mat_name.startswith("12070197922454493211"):
+                                bpy.ops.object.mode_set(mode="EDIT")
+                                bpy.ops.mesh.select_all(action="DESELECT")
+                                obj.active_material_index = index
 
-                            # 选择目标材质的网格
-                            bpy.ops.mesh.select_mode(
-                                use_extend=False, use_expand=False, type="FACE"
-                            )
+                                # 选择目标材质的网格
+                                bpy.ops.mesh.select_mode(
+                                    use_extend=False, use_expand=False, type="VERT"
+                                )
 
-                            bpy.ops.object.material_slot_select()
+                                bpy.ops.object.material_slot_select()
 
-                            bpy.ops.mesh.delete(type="VERT")
-                            bpy.ops.mesh.select_all(action="DESELECT")
-                            bpy.ops.object.mode_set(mode="OBJECT")
-                            deleted_num += 1
+                                bpy.ops.mesh.delete(type="VERT")
+                                bpy.ops.mesh.select_all(action="DESELECT")
+                                # bpy.ops.object.mode_set(mode="OBJECT")
+                                deleted_num += 1
 
+                bpy.ops.object.mode_set(mode="OBJECT")
                 obj.select_set(False)
             else:
                 continue
