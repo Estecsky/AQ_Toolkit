@@ -17,7 +17,7 @@ bl_info = {
     "blender": (4, 0, 0),
     "location": "3D 视图 > 侧边栏 | 着色器编辑器 > 侧边栏 > 工具",  # 插件显示的位置
     "category": "3D View",
-    "version": (0, 6, 0),
+    "version": (0, 7, 0),
     "doc_url": "https://github.com/Estecsky/AQ_Toolkit",
 }
 
