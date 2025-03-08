@@ -1,5 +1,5 @@
 # AQ-Toolkit
-> 为Blender定制的个人mod工具箱，为其他游戏mood定制的功能为可选开关
+> 为Blender定制的个人mod工具箱，为其他游戏mod定制的功能为可选开关
 
 ## Blender版本3.x-4.0
 
