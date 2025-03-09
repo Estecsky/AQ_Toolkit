@@ -8,16 +8,20 @@ from . import (
     AQ_property,
     AQ_HellDivers2_ExpandTool,
     AQ_Prefs,
+    addonPreferences,
+    AQ_MHWilds_ExpandTool,
 )
+from . import addon_updater_ops, addon_updater
 
 
 bl_info = {
     "name": "AQ_Toolkit",
     "description": "为blender定制的个人工具箱",
+    "author": "AQ_Echoo",
     "blender": (4, 0, 0),
-    "location": "3D 视图 > 侧边栏 | 着色器编辑器 > 侧边栏 > 工具",  # 插件显示的位置
+    "location": "3D 视图 > 侧边栏 | 着色器编辑器 > 侧边栏 > 工具",
     "category": "3D View",
-    "version": (0, 7, 1),
+    "version": (0, 9, 0),
     "doc_url": "https://github.com/Estecsky/AQ_Toolkit",
 }
 
@@ -38,6 +42,12 @@ if "bpy" in locals():
         importlib.reload(AQ_HellDivers2_ExpandTool)
     if "AQ_Prefs" in locals():
         importlib.reload(AQ_Prefs)
+    if "addonPreferences" in locals():
+        importlib.reload(addonPreferences)
+    if "addon_updater_ops" in locals():
+        importlib.reload(addon_updater_ops)
+    if "AQ_MHWilds_ExpandTool" in locals():
+        importlib.reload(AQ_MHWilds_ExpandTool)
 
 
 def register():
@@ -48,7 +58,9 @@ def register():
     AQ_panel.register()
     AQ_Batch_img_load.register()
     AQ_HellDivers2_ExpandTool.register()
-    AQ_Prefs.register()
+    AQ_MHWilds_ExpandTool.register()
+    addonPreferences.register()
+    addon_updater_ops.register(bl_info)
 
 
 def unregister():
@@ -56,9 +68,11 @@ def unregister():
     AQ_panel.unregister()
     AQ_Batch_img_load.unregister()
     AQ_HellDivers2_ExpandTool.unregister()
+    AQ_MHWilds_ExpandTool.unregister()
     bpy.utils.unregister_class(AQ_CusProperty)
     del bpy.types.Scene.AQ_Props
-    AQ_Prefs.unregister()
+    addonPreferences.unregister()
+    addon_updater_ops.unregister()
 
 
 if __name__ == "__main__":
