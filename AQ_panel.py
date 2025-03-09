@@ -2,15 +2,15 @@ import bpy
 import webbrowser
 from .AQ_Batch_img_load import BatchImgLoad, RemoveFilePath, ImportImgFilePath
 
-from . import AQ_HellDivers2_ExpandTool
-from . import AQ_MHWilds_ExpandTool
+from 。 import AQ_HellDivers2_ExpandTool
+from 。 import AQ_MHWilds_ExpandTool
 from .AQ_Prefs import AQ_PublicClass
 
 
 class AQ_3DViewPanel(bpy.types.Panel):
     # 标签
     bl_order = 0
-    bl_label = "AQの工具箱"  # 面板显示名称
+    bl_label = "AQの工具箱" 
     bl_idname = "AQ_PT_Toolkit_Panel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
