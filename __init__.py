@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import PointerProperty, BoolProperty
 from .AQ_property import AQ_CusProperty
-from 。 import (
+from . import (
     AQ_Toolkit_ops,
     AQ_panel,
     AQ_Batch_img_load,
@@ -11,7 +11,7 @@ from 。 import (
     addonPreferences,
     AQ_MHWilds_ExpandTool,
 )
-from 。 import addon_updater_ops, addon_updater
+from . import addon_updater_ops, addon_updater
 
 
 bl_info = {
