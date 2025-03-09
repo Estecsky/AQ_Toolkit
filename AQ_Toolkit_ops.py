@@ -298,7 +298,10 @@ class ButtonCombineVertexGroups(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        obj = bpy.context.active_object
+        if bpy.context.active_object:
+            obj = bpy.context.active_object
+        else:
+            return False
         return obj.type == "MESH"
 
     def execute(self, context):
