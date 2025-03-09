@@ -1,7 +1,8 @@
 import bpy
 from .AQ_Prefs import AQ_PublicClass
-from 。 import addon_updater_ops
+from . import addon_updater_ops
 from bpy.props import BoolProperty, IntProperty
+
 
 @addon_updater_ops.make_annotations
 class AQ_Toolkit_AddonPreferences(bpy.types.AddonPreferences):
