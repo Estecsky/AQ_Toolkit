@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import PointerProperty, BoolProperty
 from .AQ_property import AQ_CusProperty
-from . import (
+from 。 import (
     AQ_Toolkit_ops,
     AQ_panel,
     AQ_Batch_img_load,
@@ -11,7 +11,7 @@ from . import (
     addonPreferences,
     AQ_MHWilds_ExpandTool,
 )
-from . import addon_updater_ops, addon_updater
+from 。 import addon_updater_ops, addon_updater
 
 
 bl_info = {
@@ -21,7 +21,7 @@ bl_info = {
     "blender": (4, 0, 0),
     "location": "3D 视图 > 侧边栏 | 着色器编辑器 > 侧边栏 > 工具",
     "category": "3D View",
-    "version": (0, 9, 0),
+    "version": (0, 9, 1),
     "doc_url": "https://github.com/Estecsky/AQ_Toolkit",
 }
 
