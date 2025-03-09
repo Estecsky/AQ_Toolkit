@@ -27,3 +27,9 @@ class AQ_CusProperty(bpy.types.PropertyGroup):
         min=0,
         max=999,
     )  # type: ignore
+
+    MakeDirs_Path: StringProperty(
+        name="MakeDirsPath",
+        description="需要创建的多级目录，建议从根目录natives开始复制输入路径",
+        default="",
+    )  # type: ignore

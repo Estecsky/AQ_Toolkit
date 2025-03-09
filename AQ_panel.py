@@ -3,6 +3,7 @@ import webbrowser
 from .AQ_Batch_img_load import BatchImgLoad, RemoveFilePath, ImportImgFilePath
 
 from . import AQ_HellDivers2_ExpandTool
+from . import AQ_MHWilds_ExpandTool
 from .AQ_Prefs import AQ_PublicClass
 
 
@@ -136,22 +137,24 @@ class AQ_Toolkit_ExpandTools(bpy.types.Panel):
             addon_prefs = AQ_PublicClass.get_addon_prefs()
             # 添加后续工具开关
             HD2_ExpandToolSwitch = addon_prefs.HD2ExpandTool
-
+            MHWilds_ExpandToolSwitch = addon_prefs.MHWildsExpandTool
         except AttributeError as err:
             HD2_ExpandToolSwitch = True
             print(err)
             print("没有找到插件偏好设置")
-
+        Expandlist = [HD2_ExpandToolSwitch, MHWilds_ExpandToolSwitch]
         # =======================
         # 绘制
         # =======================
         layout = self.layout
         box = layout.box()
-        if HD2_ExpandToolSwitch:
-            AQ_HellDivers2_ExpandTool.ExpandPanel(box)
+        if any(Expandlist):
+            if HD2_ExpandToolSwitch:
+                AQ_HellDivers2_ExpandTool.ExpandPanel(box)
+            if MHWilds_ExpandToolSwitch:
+                AQ_MHWilds_ExpandTool.ExpandPanel(box)
         # if  某开关：
         #     绘制某工具面板函数
-
         else:
             box.label(text="没有启用任何拓展工具，在插件偏好设置中开启")
 
