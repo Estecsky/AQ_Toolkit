@@ -1363,7 +1363,7 @@ def register(bl_info):
     # updater.addon = # define at top of module, MUST be done first
 
     # Website for manual addon download, optional but recommended to set.
-    updater.website = "https://github.com/Estecsky/AQ_Toolkit"
+    updater.website = "https://github.com/Estecsky/AQ_Toolkit/"
 
     # Addon subfolder path.
     # "sample/path/to/addon"
