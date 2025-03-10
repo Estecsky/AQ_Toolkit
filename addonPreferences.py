@@ -41,7 +41,9 @@ class AQ_Toolkit_AddonPreferences(bpy.types.AddonPreferences):
         min=0,
         max=59,
     )  # type: ignore
-
+    # ====================
+    # 偏好拓展属性
+    # ====================
     HD2ExpandTool: BoolProperty(
         name="HellDivers2 扩展工具",
         default=False,
@@ -54,6 +56,16 @@ class AQ_Toolkit_AddonPreferences(bpy.types.AddonPreferences):
         description="MHWilds 扩展工具",
     )  # type: ignore
 
+    ExtraAddonTool: BoolProperty(
+        name="额外附加工具",
+        default=False,
+        description="附加工具",
+    )  # type: ignore
+
+    # =====================
+    # 在偏好设置绘制
+    # =====================
+
     def draw(self, context):
 
         layout = self.layout
@@ -61,7 +73,8 @@ class AQ_Toolkit_AddonPreferences(bpy.types.AddonPreferences):
         # 扩展工具开关
         layout.prop(self, "HD2ExpandTool")
         layout.prop(self, "MHWildsExpandTool")
-        # print(self.HD2_ExpandToolSwitch)
+        layout.prop(self, "ExtraAddonTool")
+
         addon_updater_ops.update_settings_ui(self, context)
 
 

@@ -5,6 +5,7 @@ from .AQ_Batch_img_load import BatchImgLoad, RemoveFilePath, ImportImgFilePath
 from . import AQ_HellDivers2_ExpandTool
 from . import AQ_MHWilds_ExpandTool
 from .AQ_Prefs import AQ_PublicClass
+from .additional_addons.ui import draw_ButtonRemoveAndScaleMesh, extra_addons_panel
 
 
 class AQ_3DViewPanel(bpy.types.Panel):
@@ -57,7 +58,9 @@ class AQ_3DViewPanel(bpy.types.Panel):
         row = box.row()
         row.scale_y = 1.5
         row.operator("objectops.reserved_one_face", icon="MESH_DATA", text="保留一个面")
-
+        # 绘制额外操作符按钮
+        draw_ButtonRemoveAndScaleMesh(box)
+        # 常用工具
         row = box.row()
         row.scale_y = 0.5
         row.label(text="常用工具:", icon="TOOL_SETTINGS")
@@ -115,7 +118,6 @@ class AQ_BatchLoadImgUI(bpy.types.Panel):
 
 
 class AQ_Toolkit_ExpandTools(bpy.types.Panel):
-    global HD2_ExpandToolSwitch
     bl_order = 50
     bl_label = "拓展工具"
     bl_idname = "AQ_PT_Toolkit_ExpandTools"
@@ -138,11 +140,17 @@ class AQ_Toolkit_ExpandTools(bpy.types.Panel):
             # 添加后续工具开关
             HD2_ExpandToolSwitch = addon_prefs.HD2ExpandTool
             MHWilds_ExpandToolSwitch = addon_prefs.MHWildsExpandTool
+            ExtraAddonToolSwitch = addon_prefs.ExtraAddonTool
         except AttributeError as err:
             HD2_ExpandToolSwitch = True
             print(err)
             print("没有找到插件偏好设置")
-        Expandlist = [HD2_ExpandToolSwitch, MHWilds_ExpandToolSwitch]
+
+        Expandlist = [
+            HD2_ExpandToolSwitch,
+            MHWilds_ExpandToolSwitch,
+            ExtraAddonToolSwitch,
+        ]
         # =======================
         # 绘制
         # =======================
@@ -153,8 +161,10 @@ class AQ_Toolkit_ExpandTools(bpy.types.Panel):
                 AQ_HellDivers2_ExpandTool.ExpandPanel(box)
             if MHWilds_ExpandToolSwitch:
                 AQ_MHWilds_ExpandTool.ExpandPanel(box)
-        # if  某开关：
-        #     绘制某工具面板函数
+            if ExtraAddonToolSwitch:
+                extra_addons_panel(box)
+            # if  某开关：
+            #     绘制某工具面板函数
         else:
             box.label(text="没有启用任何拓展工具，在插件偏好设置中开启")
 
@@ -172,9 +182,10 @@ class AQ_Toolkit_Credits(bpy.types.Panel):
         layout = self.layout
         box = layout.box()
         box.label(text="作者：AQ_Echoo")
-        col = box.column(align=True)
+        col = box.column()
         col.operator(ButtonAQGitHub.bl_idname, text="GitHub", icon="URL")
         col.operator(ButtonAQBilibili.bl_idname, text="Bilibili", icon="URL")
+        box.label(text="部分工具贡献者：FT-A7")
 
 
 class ButtonAQGitHub(bpy.types.Operator):

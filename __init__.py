@@ -11,7 +11,11 @@ from . import (
     addonPreferences,
     AQ_MHWilds_ExpandTool,
 )
-from . import addon_updater_ops, addon_updater
+from . import addon_updater_ops
+from .additional_addons import (
+    register as register_additional_addons,
+    unregister as unregister_additional_addons,
+)
 
 
 bl_info = {
@@ -21,7 +25,7 @@ bl_info = {
     "blender": (4, 0, 0),
     "location": "3D 视图 > 侧边栏 | 着色器编辑器 > 侧边栏 > 工具",
     "category": "3D View",
-    "version": (0, 9, 1),
+    "version": (0, 94, 0),
     "doc_url": "https://github.com/Estecsky/AQ_Toolkit",
 }
 
@@ -61,6 +65,7 @@ def register():
     AQ_MHWilds_ExpandTool.register()
     addonPreferences.register()
     addon_updater_ops.register(bl_info)
+    register_additional_addons()
 
 
 def unregister():
@@ -73,6 +78,7 @@ def unregister():
     del bpy.types.Scene.AQ_Props
     addonPreferences.unregister()
     addon_updater_ops.unregister()
+    unregister_additional_addons()
 
 
 if __name__ == "__main__":
