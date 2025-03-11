@@ -34,10 +34,11 @@ class ButtonRemoveEmpty(bpy.types.Operator):
 
 class ButtonRemoveUnusedBones(bpy.types.Operator):
     bl_label = "remove_unused_bones"
-    bl_description = "根据模型的骨架修改器移除骨架中没有对应顶点组的骨骼"
+    bl_description = "根据模型的骨架修改器选中/移除骨架中没有对应顶点组的骨骼"
     bl_idname = "misremove_unused.ops_bones"
 
     def execute(self, context):
+        props = bpy.context.scene.AQ_Props
         obj = bpy.context.object
         vertex_groups = obj.vertex_groups
         skeleton = obj.find_armature()
@@ -64,29 +65,35 @@ class ButtonRemoveUnusedBones(bpy.types.Operator):
                 if not exists_in_vg:
                     bones_to_remove.append(bone_name)
 
-            # 删除不存在对应顶点组的骨骼
+            # 选择编辑不存在对应顶点组的骨骼
             bpy.ops.object.mode_set(mode="OBJECT")  # 确保在对象模式下
             bpy.ops.object.select_all(action="DESELECT")
             skeleton.select_set(True)
             bpy.context.view_layer.objects.active = skeleton
-            bpy.ops.object.mode_set(mode="EDIT")  # 进入编辑模式以删除骨骼
-            # print(bones_to_remove)
+            bpy.ops.object.mode_set(mode="EDIT")  # 进入编辑模式以编辑骨骼
+
             if bones_to_remove:
+                # 根据开关判断是否移除选中的未使用骨骼
+                if props.SelectAndRemove_bone == True:
+                    for bone_name in bones_to_remove:
 
-                for bone_name in bones_to_remove:
+                        edit_bone = skeleton_data.edit_bones.get(bone_name)
 
-                    edit_bone = skeleton_data.edit_bones.get(bone_name)
+                        skeleton_data.edit_bones.remove(edit_bone)
+                        self.report({"INFO"}, f"骨骼 '{bone_name}' 已移除.")
+                else:
+                    select_num = 0
+                    bpy.ops.armature.select_all(action="DESELECT")
+                    for bone_name in bones_to_remove:
+                        edit_bone = skeleton_data.edit_bones.get(bone_name)
+                        # 选中bone
+                        edit_bone.select = True
+                        select_num += 1
 
-                    skeleton_data.edit_bones.remove(edit_bone)
-                    self.report({"INFO"}, f"骨骼 '{bone_name}' 已移除.")
+                    self.report({"INFO"}, f"已选中{select_num}个未使用骨骼")
 
             else:
                 self.report({"WARNING"}, "没有找到任何未使用骨骼，请先移除空顶点组")
-
-            # 更新物体的所有顶点组
-            # obj.vertex_groups.clear()
-            # for vg in vertex_groups:
-            #     obj.vertex_groups.new(name=vg.name)
 
             return {"FINISHED"}
 

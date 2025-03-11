@@ -78,8 +78,9 @@ class AQ_3DViewPanel(bpy.types.Panel):
         row = box.row()
         row.scale_y = 1.4
         row.operator(
-            "misremove_unused.ops_bones", icon="BONE_DATA", text="删除未使用的骨骼"
+            "misremove_unused.ops_bones", icon="BONE_DATA", text="选择未使用的骨骼"
         )
+        row.prop(props, "SelectAndRemove_bone", text="", icon="TRASH")
         row = box.row()
         row.scale_y = 0.5
         row.label(text="顶点组权重合并:", icon="GROUP_VERTEX")

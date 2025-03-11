@@ -223,6 +223,7 @@ class ButtonMarkContrastVert(bpy.types.Operator):
     bl_idname = "mesh.a7_compare_and_contrast_vert_to_vg"
     bl_label = "对比两个物体到顶点组"
     bl_options = {"REGISTER", "UNDO"}
+    bl_description = "对比两个物体到顶点组，使两个物体相交的顶点组权重相同"
 
     thresholds: bpy.props.FloatProperty(name="阈值", default=0.001)
     vert_groups_name: bpy.props.StringProperty(

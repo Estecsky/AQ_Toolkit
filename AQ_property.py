@@ -33,3 +33,8 @@ class AQ_CusProperty(bpy.types.PropertyGroup):
         description="需要创建的多级目录，建议从根目录natives开始复制输入路径",
         default="",
     )  # type: ignore
+    SelectAndRemove_bone: BoolProperty(
+        name="SelectAndRemove_bone",
+        description="选择后直接删除骨骼",
+        default=False,
+    )  # type: ignore
