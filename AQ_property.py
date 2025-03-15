@@ -20,6 +20,11 @@ class AQ_CusProperty(bpy.types.PropertyGroup):
         description="保留面后自动打开透视模式",
         default=True,
     )  # type: ignore
+    Auto_BacktoObject: BoolProperty(
+        name="Auto Backto Object",
+        description="缩放后自动返回物体模式",
+        default=True,
+    )  # type: ignore
     Comebine_vgroup_num: IntProperty(
         name="Comebine vgroup num",
         description="将需要合并的组改为同前缀名，（例如0，0.001，1，1.001，将分别合并为0，1两组）从0开始，往后顺延",

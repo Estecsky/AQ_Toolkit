@@ -58,6 +58,9 @@ class AQ_3DViewPanel(bpy.types.Panel):
         row = box.row()
         row.scale_y = 1.5
         row.operator("objectops.reserved_one_face", icon="MESH_DATA", text="保留一个面")
+        row = box.row()
+        row.scale_y = 1
+        row.prop(props, "Auto_BacktoObject", text="缩放后返回物体模式")
         # 绘制额外操作符按钮
         draw_ButtonRemoveAndScaleMesh(box)
         # 常用工具

@@ -216,6 +216,8 @@ class ButtonRemoveAndScaleMesh(bpy.types.Operator):
             bmesh.update_edit_mesh(obj.data)
 
             obj.data.update()
+        if bpy.context.scene.AQ_Props.Auto_BacktoObject:
+            bpy.ops.object.mode_set(mode="OBJECT")
         return {"FINISHED"}
 
 
