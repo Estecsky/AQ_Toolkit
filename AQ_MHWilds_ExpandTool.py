@@ -35,23 +35,42 @@ class ButtonMakeDirsPath(bpy.types.Operator, ExportHelper):
 
     def execute(self, context):
         input_path = bpy.context.scene.AQ_Props.MakeDirs_Path
+        is_moreDirs = bpy.context.scene.AQ_Props.MakeSeqDirs_Path
         if "\\" in input_path:
             input_path = input_path.replace("\\", "/")
         try:
             if input_path.startswith("natives/STM") or input_path.startswith(
                 "natives/stm"
             ):
-                os.makedirs(self.filepath + input_path)
-                self.report({"INFO"}, f"多级文件夹创建完成{self.filepath + input_path}")
+                if is_moreDirs:
+                    for i in range(1, 6):
+                        os.makedirs(self.filepath + input_path + "/" + str(i))
+                    self.report(
+                        {"INFO"},
+                        f"更多文件夹在多级文件夹创建完成{self.filepath + input_path}",
+                    )
+                else:
+                    os.makedirs(self.filepath + input_path)
+                    self.report(
+                        {"INFO"}, f"多级文件夹创建完成{self.filepath + input_path}"
+                    )
 
             # elif input_path.startswith("STM") or input_path.startswith("stm"):
             #     input_path = "natives/" + input_path
             else:
-                os.makedirs(self.filepath + input_path)
-                self.report(
-                    {"WARNING"},
-                    f"路径没有从根目录natives/STM开始，多级文件夹创建完成{self.filepath + input_path}",
-                )
+                if is_moreDirs:
+                    for i in range(1, 6):
+                        os.makedirs(self.filepath + input_path + "/" + str(i))
+                    self.report(
+                        {"WARNING"},
+                        f"路径没有从根目录natives/STM开始，更多文件夹创建完成{self.filepath + input_path}",
+                    )
+                else:
+                    os.makedirs(self.filepath + input_path)
+                    self.report(
+                        {"WARNING"},
+                        f"路径没有从根目录natives/STM开始，多级文件夹创建完成{self.filepath + input_path}",
+                    )
         except FileExistsError as e:
             self.report(
                 {"ERROR"},
@@ -65,6 +84,9 @@ def ExpandPanel(layout):
     props = bpy.context.scene.AQ_Props
     row.scale_y = 0.5
     row.label(text="Monster Hunter Wilds拓展组件", icon="TOOL_SETTINGS")
+    row = layout.row()
+    row.scale_y = 1
+    row.prop(props, "MakeSeqDirs_Path", text="自动在底层文件夹下创建编号1到5的文件夹")
     row = layout.row()
     row.scale_y = 1.3
     row.prop(props, "MakeDirs_Path", text="输入多级目录")
