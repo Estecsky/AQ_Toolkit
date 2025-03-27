@@ -1,6 +1,6 @@
 import bpy
-from bpy.props import StringProperty, IntProperty, BoolProperty
-
+from bpy.props import StringProperty, IntProperty, BoolProperty,EnumProperty
+from .aq_bones_snap.reload_presets import reloadPresets
 
 class AQ_CusProperty(bpy.types.PropertyGroup):
 
@@ -47,4 +47,18 @@ class AQ_CusProperty(bpy.types.PropertyGroup):
         name="SelectAndRemove_bone",
         description="选择后直接删除骨骼",
         default=False,
+    )  # type: ignore
+
+    #--------------------
+    
+    BoneSnapPanel : BoolProperty(default=False)  # type: ignore
+    MHWilds_Fix_Bones : BoolProperty(default=False,description="只有对于荒野骨骼才有的修正应该开启此项")  # type: ignore
+    
+    def getBoneList(self, context):
+        return reloadPresets()
+    
+    BoneList: EnumProperty(
+    name="",
+    description="",
+    items=getBoneList
     )  # type: ignore

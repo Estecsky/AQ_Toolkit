@@ -16,6 +16,7 @@ from .additional_addons import (
     register as register_additional_addons,
     unregister as unregister_additional_addons,
 )
+from .aq_bones_snap import snap_ops
 
 
 bl_info = {
@@ -25,7 +26,7 @@ bl_info = {
     "blender": (4, 0, 0),
     "location": "3D 视图 > 侧边栏 | 着色器编辑器 > 侧边栏 > 工具",
     "category": "3D View",
-    "version": (0, 98, 0),
+    "version": (1, 0, 0),
     "doc_url": "https://github.com/Estecsky/AQ_Toolkit",
 }
 
@@ -66,6 +67,7 @@ def register():
     addonPreferences.register()
     addon_updater_ops.register(bl_info)
     register_additional_addons()
+    snap_ops.register()
 
 
 def unregister():
@@ -79,6 +81,7 @@ def unregister():
     addonPreferences.unregister()
     addon_updater_ops.unregister()
     unregister_additional_addons()
+    snap_ops.unregister()
 
 
 if __name__ == "__main__":

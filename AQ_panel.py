@@ -7,6 +7,7 @@ from . import AQ_MHWilds_ExpandTool
 from .AQ_Prefs import AQ_PublicClass
 from .additional_addons.ui import draw_ButtonRemoveAndScaleMesh, extra_addons_panel
 
+from .aq_bones_snap.snap_panel import draw_SnapPanel
 
 class AQ_3DViewPanel(bpy.types.Panel):
     # 标签
@@ -95,6 +96,12 @@ class AQ_3DViewPanel(bpy.types.Panel):
         row.operator(
             "object.aq_combine_vertex_groups", icon="CHECKMARK", text="合并顶点组权重"
         )
+        box = layout.box()
+        row = box.row()
+        row.prop(props,"BoneSnapPanel",icon="DOWNARROW_HLT" if props.BoneSnapPanel else "RIGHTARROW",
+            icon_only=True, emboss=False, text=" 骨骼吸附")
+        if props.BoneSnapPanel:
+            draw_SnapPanel(box)
 
 
 class AQ_BatchLoadImgUI(bpy.types.Panel):
