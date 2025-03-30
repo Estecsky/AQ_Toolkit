@@ -8,7 +8,7 @@ def draw_SnapPanel(layout):
     row.label(text="必须先标记吸附骨架，需要同时选中目标骨架与吸附骨架", icon="ERROR")
     row = layout.row()
     row.scale_y = 0.5
-    row.label(text="提示：吸附骨架将会吸附到目标骨架", icon="ERROR")
+    row.label(text="吸附骨架将会吸附到目标骨架", icon="ERROR")
     
     row = layout.row()
     row.scale_y = 1.3
