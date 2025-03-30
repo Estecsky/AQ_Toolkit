@@ -9,99 +9,104 @@ from .additional_addons.ui import draw_ButtonRemoveAndScaleMesh, extra_addons_pa
 
 from .aq_bones_snap.snap_panel import draw_SnapPanel
 
-class AQ_3DViewPanel(bpy.types.Panel):
-    # 标签
-    bl_order = 0
-    bl_label = "AQの工具箱"
-    bl_idname = "AQ_PT_Toolkit_Panel"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_category = "AQ_Toolkit"
 
-    def draw(self, context):
-        props = context.scene.AQ_Props
-        layout = self.layout
-        box = layout.box()
+def drawAQ_3DViewPanel(layout):
+    props = bpy.context.scene.AQ_Props
+    # layout = self.layout
+    box = layout.box()
 
-        row = box.row(align=True)
-        row.scale_y = 0.5
-        row.label(text="顶点断离:", icon="MESH_DATA")
-        row = box.row(align=True)
-        row.scale_y = 1.5
-        row.operator("meshops.split_mesh_along_uvs", icon="UV", text="根据UV岛断离网格")
+    row = box.row(align=True)
+    row.scale_y = 0.5
+    row.label(text="顶点断离:", icon="MESH_DATA")
+    row = box.row(align=True)
+    row.scale_y = 1.5
+    row.operator("meshops.split_mesh_along_uvs", icon="UV", text="根据UV岛断离网格")
 
-        row = box.row()
-        row.scale_y = 0.5
-        row.label(text="网格清理:", icon="MESH_DATA")
-        row = box.row()
-        row.scale_y = 1.0
-        row.prop(props, "AQ_limitWeightValue", text="自定义权重限制值")
-        row = box.row()
-        row.scale_y = 1.5
-        row.operator(
-            "meshops.limit_and_normalize_weights",
-            icon="MESH_DATA",
-            text="限制并规范权重",
-        )
-        row = box.row()
-        row.scale_y = 1.5
-        row.operator(
-            "meshops.delete_loose_edges_and_verts",
-            icon="MESH_DATA",
-            text="删除孤立边和顶点",
-        )
-        row = box.row()
-        row.scale_y = 0.5
-        row.label(text="网格编辑:", icon="MESH_DATA")
-        row = box.row()
-        row.scale_y = 1
-        row.prop(props, "Auto_Xray_Shading", text="自动打开透视模式")
-        row = box.row()
-        row.scale_y = 1.5
-        row.operator("objectops.reserved_one_face", icon="MESH_DATA", text="保留一个面")
-        row = box.row()
-        row.scale_y = 1
-        row.prop(props, "Auto_BacktoObject", text="缩放后返回物体模式")
-        # 绘制额外操作符按钮
-        draw_ButtonRemoveAndScaleMesh(box)
-        # 常用工具
-        row = box.row()
-        row.scale_y = 0.5
-        row.label(text="常用工具:", icon="TOOL_SETTINGS")
-        row = box.row()
-        row.scale_y = 1.5
-        row.operator(
-            "meshops.select_0_weight_vertices", icon="VERTEXSEL", text="选择0权重顶点"
-        )
-        row = box.row()
-        row.scale_y = 1.5
-        row.operator("panel_ops.remove_empty", icon="GROUP_VERTEX", text="移除空顶点组")
-        row = box.row()
-        row.scale_y = 1.4
-        row.operator("select.aq_select_seams", icon="EDGESEL", text="选中缝合边")
-        row = box.row()
-        row.scale_y = 1.4
-        row.operator(
-            "misremove_unused.ops_bones", icon="BONE_DATA", text="选择未使用的骨骼"
-        )
-        row.prop(props, "SelectAndRemove_bone", text="", icon="TRASH")
-        row = box.row()
-        row.scale_y = 0.5
-        row.label(text="顶点组权重合并:", icon="GROUP_VERTEX")
-        row = box.row()
-        row.scale_y = 1.0
-        row.prop(props, "Comebine_vgroup_num", text="合并组的编号")
-        row = box.row()
-        row.scale_y = 1.4
-        row.operator(
-            "object.aq_combine_vertex_groups", icon="CHECKMARK", text="合并顶点组权重"
-        )
-        box = layout.box()
-        row = box.row()
-        row.prop(props,"BoneSnapPanel",icon="DOWNARROW_HLT" if props.BoneSnapPanel else "RIGHTARROW",
-            icon_only=True, emboss=False, text=" 骨骼吸附")
-        if props.BoneSnapPanel:
-            draw_SnapPanel(box)
+    row = box.row()
+    row.scale_y = 0.5
+    row.label(text="网格清理:", icon="MESH_DATA")
+    row = box.row()
+    row.scale_y = 1.0
+    row.prop(props, "AQ_limitWeightValue", text="自定义权重限制值")
+    row = box.row()
+    row.scale_y = 1.5
+    row.operator(
+        "meshops.limit_and_normalize_weights",
+        icon="MESH_DATA",
+        text="限制并规范权重",
+    )
+    row = box.row()
+    row.scale_y = 1.5
+    row.operator(
+        "meshops.delete_loose_edges_and_verts",
+        icon="MESH_DATA",
+        text="删除孤立边和顶点",
+    )
+    row = box.row()
+    row.scale_y = 0.5
+    row.label(text="网格编辑:", icon="MESH_DATA")
+    row = box.row()
+    row.scale_y = 1
+    row.prop(props, "Auto_Xray_Shading", text="自动打开透视模式")
+    row = box.row()
+    row.scale_y = 1.5
+    row.operator("objectops.reserved_one_face", icon="MESH_DATA", text="保留一个面")
+    row = box.row()
+    row.scale_y = 1
+    row.prop(props, "Auto_BacktoObject", text="缩放后返回物体模式")
+    # 绘制额外操作符按钮
+    draw_ButtonRemoveAndScaleMesh(box)
+    # 二次元脸部法向优化模板
+    row = box.row()
+    row.scale_y = 0.5
+    row.label(text="法向优化:", icon="MOD_DATA_TRANSFER")
+    row = box.row()
+    row.scale_y = 1
+    row.prop(props, "ApplyMirrorModifier", text="自动应用模板的镜像修改器")
+    row.prop(props, "TemplateNewCollection", text="导入时创建新集合")
+    row = box.row()
+    row.scale_y = 1.5
+    row.operator(
+        "model.import_face_optimize_template", icon="IMPORT", text="导入面部法向优化模板"
+    )
+    # 常用工具
+    row = box.row()
+    row.scale_y = 0.5
+    row.label(text="常用工具:", icon="TOOL_SETTINGS")
+    row = box.row()
+    row.scale_y = 1.5
+    row.operator(
+        "meshops.select_0_weight_vertices", icon="VERTEXSEL", text="选择0权重顶点"
+    )
+    row = box.row()
+    row.scale_y = 1.5
+    row.operator("panel_ops.remove_empty", icon="GROUP_VERTEX", text="移除空顶点组")
+    row = box.row()
+    row.scale_y = 1.4
+    row.operator("select.aq_select_seams", icon="EDGESEL", text="选中缝合边")
+    row = box.row()
+    row.scale_y = 1.4
+    row.operator(
+        "misremove_unused.ops_bones", icon="BONE_DATA", text="选择未使用的骨骼"
+    )
+    row.prop(props, "SelectAndRemove_bone", text="", icon="TRASH")
+    row = box.row()
+    row.scale_y = 0.5
+    row.label(text="顶点组权重合并:", icon="GROUP_VERTEX")
+    row = box.row()
+    row.scale_y = 1.0
+    row.prop(props, "Comebine_vgroup_num", text="合并组的编号")
+    row = box.row()
+    row.scale_y = 1.4
+    row.operator(
+        "object.aq_combine_vertex_groups", icon="CHECKMARK", text="合并顶点组权重"
+    )
+    box = layout.box()
+    row = box.row()
+    row.prop(props,"BoneSnapPanel",icon="DOWNARROW_HLT" if props.BoneSnapPanel else "RIGHTARROW",
+        icon_only=True, emboss=False, text=" 骨骼吸附")
+    if props.BoneSnapPanel:
+        draw_SnapPanel(box)
 
 
 class AQ_BatchLoadImgUI(bpy.types.Panel):
@@ -220,7 +225,6 @@ class ButtonAQBilibili(bpy.types.Operator):
 
 
 def register():
-    bpy.utils.register_class(AQ_3DViewPanel)
     bpy.utils.register_class(AQ_BatchLoadImgUI)
     bpy.utils.register_class(AQ_Toolkit_ExpandTools)
     bpy.utils.register_class(AQ_Toolkit_Credits)
@@ -229,7 +233,7 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(AQ_3DViewPanel)
+
     bpy.utils.unregister_class(AQ_BatchLoadImgUI)
     bpy.utils.unregister_class(AQ_Toolkit_ExpandTools)
     bpy.utils.unregister_class(AQ_Toolkit_Credits)

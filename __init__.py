@@ -18,7 +18,6 @@ from .additional_addons import (
 )
 from .aq_bones_snap import snap_ops
 
-
 bl_info = {
     "name": "AQ_Toolkit",
     "description": "为blender定制的个人工具箱",
@@ -26,10 +25,9 @@ bl_info = {
     "blender": (4, 0, 0),
     "location": "3D 视图 > 侧边栏 | 着色器编辑器 > 侧边栏 > 工具",
     "category": "3D View",
-    "version": (1, 0, 0),
+    "version": (1, 1, 0),
     "doc_url": "https://github.com/Estecsky/AQ_Toolkit",
 }
-
 # Reloads the addons on script reload
 # Good for editing script
 if "bpy" in locals():
@@ -53,10 +51,28 @@ if "bpy" in locals():
         importlib.reload(addon_updater_ops)
     if "AQ_MHWilds_ExpandTool" in locals():
         importlib.reload(AQ_MHWilds_ExpandTool)
+        
+def show_addon_version(bl_info = bl_info ):
+    addon_version =  str(bl_info['version'][0])+"."+str(bl_info['version'][1])+"."+str(bl_info['version'][2])
+    return addon_version
 
+
+class AQ_3DViewPanel(bpy.types.Panel):
+    # 标签
+    bl_order = 0
+    bl_label = f"AQの工具箱 V{show_addon_version()}"
+    bl_idname = "AQ_PT_Toolkit_Panel"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "AQ_Toolkit"
+
+    def draw(self, context):
+        AQ_panel.drawAQ_3DViewPanel(self.layout)
+        
 
 def register():
-
+    
+    bpy.utils.register_class(AQ_3DViewPanel)
     bpy.utils.register_class(AQ_CusProperty)
     bpy.types.Scene.AQ_Props = PointerProperty(type=AQ_CusProperty)
     AQ_Toolkit_ops.register()
@@ -71,6 +87,7 @@ def register():
 
 
 def unregister():
+    bpy.utils.unregister_class(AQ_3DViewPanel)
     AQ_Toolkit_ops.unregister()
     AQ_panel.unregister()
     AQ_Batch_img_load.unregister()

@@ -49,6 +49,17 @@ class AQ_CusProperty(bpy.types.PropertyGroup):
         default=False,
     )  # type: ignore
 
+    ApplyMirrorModifier: BoolProperty(
+        name="ApplyMirrorModifier",
+        description="导入时应用模板的镜像修改器",
+        default=False,
+    )
+
+    TemplateNewCollection: BoolProperty(
+        name="NewCollection",
+        description="导入时创建新集合",
+        default=True,
+    )
     #--------------------
     
     BoneSnapPanel : BoolProperty(default=False)  # type: ignore

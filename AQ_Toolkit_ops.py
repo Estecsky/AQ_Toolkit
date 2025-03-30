@@ -1,5 +1,6 @@
 import bpy
 import bmesh
+import os
 
 
 class ButtonRemoveEmpty(bpy.types.Operator):
@@ -347,6 +348,62 @@ class ButtonCombineVertexGroups(bpy.types.Operator):
 
         return {"FINISHED"}
 
+class ButtonImportFaceOptimizeTemplate(bpy.types.Operator):
+    bl_idname = "model.import_face_optimize_template"
+    bl_label = "import_face_optimize_template"
+    bl_description = "导入二次元面部法向优化模板"
+    bl_options = {"REGISTER", "UNDO"}
+    
+    def execute(self, context):
+        
+        object_name = "Face_DataTransfer_Normal"
+        
+        dir_path = os.path.dirname(__file__)
+        blend_file_path = os.path.join(dir_path, "NormalOptimizeTemplate", "FaceTemplate.blend")
+        # 确保文件存在
+        if not os.path.exists(blend_file_path):
+            self.report({"ERROR"}, f"文件 {blend_file_path} 不存在")
+            return {"CANCEL"}
+        # 使用 bpy.ops.wm.append 追加对象到当前场景
+        bpy.ops.wm.append(
+            filepath=os.path.join(blend_file_path, "Object", object_name),
+            directory=os.path.join(blend_file_path, "Object"),
+            filename=object_name
+        )
+            
+        # 获取追加的物体
+        appended_object = bpy.context.selected_objects[0] if bpy.context.selected_objects else None
+        if appended_object:
+        # 高亮物体
+            bpy.ops.object.select_all(action="DESELECT")
+            appended_object.select_set(True)
+            bpy.context.view_layer.objects.active = appended_object
+            # =====================
+            if bpy.context.scene.AQ_Props.TemplateNewCollection:
+                # 创建新集合
+                collection_name = "Face_DataTransfer_Normal"
+                if collection_name not in bpy.data.collections:
+                    new_collection = bpy.data.collections.new(collection_name)
+                    bpy.context.scene.collection.children.link(new_collection)
+                else:
+                    new_collection = bpy.data.collections[collection_name]
+                
+                # 将物体放入新集合
+                if appended_object.name in bpy.context.collection.objects:
+                    bpy.context.collection.objects.unlink(appended_object)
+                new_collection.objects.link(appended_object)
+            
+
+            # 应用镜像修改器
+            if bpy.context.scene.AQ_Props.ApplyMirrorModifier:
+                # 添加镜像修改器
+                # mirror_mod = appended_object.modifiers.new(name="Mirror", type='MIRROR')
+                # 应用镜像修改器
+                bpy.ops.object.modifier_apply(modifier="Mirror")
+        
+
+        return{"FINISHED"}
+
 
 # ----------Utils----------#
 
@@ -440,6 +497,7 @@ classes = [
     ButtonReservedOneFace,
     ButtonSelectSeams,
     ButtonCombineVertexGroups,
+    ButtonImportFaceOptimizeTemplate,
 ]
 
 
