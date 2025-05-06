@@ -25,7 +25,7 @@ bl_info = {
     "blender": (4, 0, 0),
     "location": "3D 视图 > 侧边栏 | 着色器编辑器 > 侧边栏 > 工具",
     "category": "3D View",
-    "version": (1, 1, 0),
+    "version": (1, 1, 1),
     "doc_url": "https://github.com/Estecsky/AQ_Toolkit",
 }
 # Reloads the addons on script reload
