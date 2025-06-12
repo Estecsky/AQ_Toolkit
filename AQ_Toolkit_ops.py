@@ -35,68 +35,100 @@ class ButtonRemoveEmpty(bpy.types.Operator):
 
 class ButtonRemoveUnusedBones(bpy.types.Operator):
     bl_label = "remove_unused_bones"
-    bl_description = "根据模型的骨架修改器选中/移除骨架中没有对应顶点组的骨骼"
+    bl_description = "根据模型的骨架修改器选中/移除骨架中没有对应顶点组的骨骼(可多选物体)，物体应该是网格并且正确设置骨架修改器，至少有一个顶点组"
     bl_idname = "misremove_unused.ops_bones"
 
     def execute(self, context):
         props = bpy.context.scene.AQ_Props
-        obj = bpy.context.object
-        vertex_groups = obj.vertex_groups
-        skeleton = obj.find_armature()
-        if obj.type != "MESH":
-            self.report({"ERROR"}, "所选物体不是网格,需要选择一个网格")
+        select_obj_valid_lst  = []
+        select_obj_valid_vertex_group_lst = []
+        select_obj_valid_armature = []
+        invalid_obj_Skel_lst = []
+        invalid_obj_type_lst = []
+        
+        select_obj = bpy.context.selected_objects
+        if len(select_obj) == 0:
+            self.report({"ERROR"}, "请选择至少一个物体")
             return {"FINISHED"}
-        if skeleton is None:
+        
+        for obj in select_obj:
+            obj_Skel = obj.find_armature()
+            if obj.type == "MESH" and len(obj.vertex_groups) > 0 and (obj_Skel is not None):
+                select_obj_valid_armature.append(obj_Skel)
+                select_obj_valid_lst.append(obj)
+                for vg in obj.vertex_groups:
+                    select_obj_valid_vertex_group_lst.append(vg.name)
+            else:
+                if obj_Skel is None and obj.type == "MESH":
+                    invalid_obj_Skel_lst.append(obj.name)
+                elif obj.type != "MESH":
+                    invalid_obj_type_lst.append(obj)
+                
+        # 列表去重
+        select_obj_valid_armature = list(set(select_obj_valid_armature))
+        select_obj_valid_vertex_group_lst = list(set(select_obj_valid_vertex_group_lst))
+        
+        if len(select_obj_valid_armature) > 1 :
+            self.report({"ERROR"}, "选择的多个物体中具有不同的骨架修改器，取消操作")
+            return {"FINISHED"}
+        elif len(select_obj_valid_lst) == 0 and len(invalid_obj_type_lst) != 0:
+            self.report({"ERROR"}, "所选物体不是网格,需要选择一个或多个网格")
+            return {"FINISHED"}
+        
+        elif len(select_obj_valid_armature) == 0 and len(invalid_obj_Skel_lst) != 0:
             self.report({"ERROR"}, "选中物体未找到正确的骨架修改器")
             return {"FINISHED"}
-        if obj.type == "MESH" and len(obj.vertex_groups) > 0:
-            bones_to_remove = []
-            bones = skeleton.data.bones
-            skeleton_data = skeleton.data
-            vg_lst = []
-            for vg in vertex_groups:
-                vg_lst.append(vg.name)
-            for bone in bones:
-                bone_name = bone.name
-                exists_in_vg = False
+        
+        if len(invalid_obj_Skel_lst) != 0 :
+            self.report({"ERROR"}, f"所选物体中有{len([invalid_obj_Skel_lst])}个物体未找到正确的骨架修改器，名称为{[invalid_obj_Skel_lst]}")
+        
+        valid_skeleton = select_obj_valid_armature[0]
 
-                if bone_name in vg_lst:
-                    exists_in_vg = True
+        bones_to_remove = []
+        bones = valid_skeleton.data.bones
+        skeleton_data = valid_skeleton.data
+        vg_lst = select_obj_valid_vertex_group_lst
+        for bone in bones:
+            bone_name = bone.name
+            exists_in_vg = False
 
-                if not exists_in_vg:
-                    bones_to_remove.append(bone_name)
+            if bone_name in vg_lst:
+                exists_in_vg = True
 
-            # 选择编辑不存在对应顶点组的骨骼
-            bpy.ops.object.mode_set(mode="OBJECT")  # 确保在对象模式下
-            bpy.ops.object.select_all(action="DESELECT")
-            skeleton.select_set(True)
-            bpy.context.view_layer.objects.active = skeleton
-            bpy.ops.object.mode_set(mode="EDIT")  # 进入编辑模式以编辑骨骼
+            if not exists_in_vg:
+                bones_to_remove.append(bone_name)
 
-            if bones_to_remove:
-                # 根据开关判断是否移除选中的未使用骨骼
-                if props.SelectAndRemove_bone == True:
-                    for bone_name in bones_to_remove:
+        # 选择编辑不存在对应顶点组的骨骼
+        bpy.ops.object.mode_set(mode="OBJECT")  # 确保在对象模式下
+        bpy.ops.object.select_all(action="DESELECT")
+        valid_skeleton.select_set(True)
+        bpy.context.view_layer.objects.active = valid_skeleton
+        bpy.ops.object.mode_set(mode="EDIT")  # 进入编辑模式以编辑骨骼
 
-                        edit_bone = skeleton_data.edit_bones.get(bone_name)
+        if bones_to_remove:
+            # 根据开关判断是否移除选中的未使用骨骼
+            if props.SelectAndRemove_bone == True:
+                for bone_name in bones_to_remove:
 
-                        skeleton_data.edit_bones.remove(edit_bone)
-                        self.report({"INFO"}, f"骨骼 '{bone_name}' 已移除.")
-                else:
-                    select_num = 0
-                    bpy.ops.armature.select_all(action="DESELECT")
-                    for bone_name in bones_to_remove:
-                        edit_bone = skeleton_data.edit_bones.get(bone_name)
-                        # 选中bone
-                        edit_bone.select = True
-                        select_num += 1
+                    edit_bone = skeleton_data.edit_bones.get(bone_name)
 
-                    self.report({"INFO"}, f"已选中{select_num}个未使用骨骼")
-
+                    skeleton_data.edit_bones.remove(edit_bone)
+                    self.report({"INFO"}, f"骨骼 '{bone_name}' 已移除.")
             else:
-                self.report({"WARNING"}, "没有找到任何未使用骨骼，请先移除空顶点组")
+                select_num = 0
+                bpy.ops.armature.select_all(action="DESELECT")
+                for bone_name in bones_to_remove:
+                    edit_bone = skeleton_data.edit_bones.get(bone_name)
+                    # 选中bone
+                    edit_bone.select = True
+                    select_num += 1
 
-            return {"FINISHED"}
+                self.report({"INFO"}, f"已选中{select_num}个未使用骨骼")
+
+        else:
+            self.report({"WARNING"}, "没有找到任何未使用骨骼，请先移除空顶点组")
+
+        return {"FINISHED"}
 
 
 class ButtonSplitMeshAlongUVs(bpy.types.Operator):
