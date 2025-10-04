@@ -61,6 +61,14 @@ class AQ_Toolkit_AddonPreferences(bpy.types.AddonPreferences):
         default=False,
         description="附加工具",
     )  # type: ignore
+    # ====================
+    # 内置偏好设置
+    # ====================
+    CleanZeroVG_AdvancedMode: BoolProperty(
+        name="高级模式",
+        default=True,
+        description="开启后，强制移除所有0权重顶点组",
+    )  # type: ignore
 
     # =====================
     # 在偏好设置绘制
