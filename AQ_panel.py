@@ -12,6 +12,7 @@ from .aq_bones_snap.snap_panel import draw_SnapPanel
 
 def drawAQ_3DViewPanel(layout):
     props = bpy.context.scene.AQ_Props
+    addon_prefs = AQ_PublicClass.get_addon_prefs()
     # layout = self.layout
     box = layout.box()
 
@@ -80,10 +81,20 @@ def drawAQ_3DViewPanel(layout):
     )
     row = box.row()
     row.scale_y = 1.5
-    row.operator("panel_ops.remove_empty", icon="GROUP_VERTEX", text="移除空顶点组")
+    if addon_prefs.CleanZeroVG_AdvancedMode:
+        row.operator("meshops.clean_zero_vg", icon="GROUP_VERTEX", text="移除空顶点组(强制)")
+    else:
+        row.operator("panel_ops.remove_empty", icon="GROUP_VERTEX", text="移除空顶点组")
+    row.prop(addon_prefs, "CleanZeroVG_AdvancedMode", text="", icon="MODIFIER")
     row = box.row()
     row.scale_y = 1.4
     row.operator("select.aq_select_seams", icon="EDGESEL", text="选中缝合边")
+    row = box.row()
+    row.scale_y = 1.4
+    row.operator("meshops.remove_shapekeys", icon="SHAPEKEY_DATA", text="移除所有形态键")
+    row = box.row()
+    row.scale_y = 1.4
+    row.operator("meshops.unify_uvs", icon="UV", text="统一UV")
     row = box.row()
     row.scale_y = 1.4
     row.operator(

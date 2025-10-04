@@ -2,11 +2,84 @@ import bpy
 import bmesh
 import os
 
+def Clean_Vertex_By_Weight():
+    def check_each_vertex_group_max_weight(obj):
+        gid_to_maxw = {}
+        # 让统计字典内的顶点组的初始值为0
+        for g in obj.vertex_groups:
+            gid_to_maxw[g.index] = 0
+        # 循环网格体的每一个顶点，统计每个顶点组的最大权重
+        for v in obj.data.vertices:
+            for g in v.groups:
+                gid = g.group
+                w = obj.vertex_groups[gid].weight(v.index)
+                if (gid_to_maxw.get(gid) is None or w > gid_to_maxw[gid]):
+                    gid_to_maxw[gid] = w
+        return gid_to_maxw
+
+    # 获得对象
+    for obj in bpy.context.selected_objects:
+        # 获得对象的 每个顶点组到最大权重的字典
+        gid_to_maxw = check_each_vertex_group_max_weight(obj)
+        # 让字典的值按大到小排序，这是为了从大到小逐个删除时，删除序号大的不会影响序号小。
+        wait_to_del_gids = []
+        for gid, maxw in gid_to_maxw.items():
+            if maxw <= 0:
+                wait_to_del_gids.append(gid)
+        # 让顶点组编号从大到小排序，这先删除编号大的不会对编号小的造成影响
+        wait_to_del_gids = sorted(wait_to_del_gids)[::-1]
+        # print(f'Delete vertex group index list {wait_to_del_gids}')
+        # 逐个删除空顶点组
+        for gid in wait_to_del_gids:
+            obj.vertex_groups.remove(obj.vertex_groups[gid])
+    # print('Success')
+
+class ButtonCleanZeroVG(bpy.types.Operator):
+    bl_idname = "meshops.clean_zero_vg"
+    bl_label = "clean zero weight vertices group"
+    bl_description = "Clear all empty vertex groups of selected mesh objects"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        # 检查是否有选中的对象
+        if context.selected_objects:
+            # 遍历所有选中的对象
+            for obj in context.selected_objects:
+                # 如果发现任何一个对象不是网格类型，返回 False
+                if obj.type != "MESH":
+                    return False
+            # 如果所有选中的对象都是网格类型，返回 True
+            return True
+        # 如果没有选中的对象，返回 False
+        return False
+
+    def execute(self, context):
+        Clean_Vertex_By_Weight()
+        self.report({'INFO'}, 'clean completed')
+        return {'FINISHED'}
+
+
 
 class ButtonRemoveEmpty(bpy.types.Operator):
     bl_idname = "panel_ops.remove_empty"
     bl_label = "remove_empty_vg"
     bl_description = "移除选中模型的空顶点组"
+
+    @classmethod
+    def poll(cls, context):
+        # 检查是否有选中的对象
+        if context.selected_objects:
+            # 遍历所有选中的对象
+            for obj in context.selected_objects:
+                # 如果发现任何一个对象不是网格类型，返回 False
+                if obj.type != "MESH":
+                    return False
+            # 如果所有选中的对象都是网格类型，返回 True
+            return True
+        # 如果没有选中的对象，返回 False
+        return False
+
 
     def execute(self, context):
         obj = bpy.context.object
@@ -295,6 +368,78 @@ class ButtonSelectSeams(bpy.types.Operator):
         bmesh.update_edit_mesh(obj.data)
         return {"FINISHED"}
 
+class ButtonRemoveShapeKeys(bpy.types.Operator):
+    bl_idname = "meshops.remove_shapekeys"
+    bl_label = "remove all shape keys"
+    bl_description = "删除选中物体的所有形态键"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        # 检查是否有选中的对象
+        if context.selected_objects:
+            # 遍历所有选中的对象
+            for obj in context.selected_objects:
+                # 如果发现任何一个对象不是网格类型，返回 False
+                if obj.type != "MESH":
+                    return False
+            # 如果所有选中的对象都是网格类型，返回 True
+            return True
+        # 如果没有选中的对象，返回 False
+        return False
+
+    def execute(self, context):
+        meshes_sel_name = sorted([o.name for o in bpy.context.selected_objects if o.type == "MESH"])
+        for n in meshes_sel_name:
+            bpy.context.view_layer.objects.active = bpy.data.objects[n]
+            obj = bpy.context.active_object
+            if obj.data.shape_keys:
+                bpy.ops.object.shape_key_remove(all=True)
+        bpy.context.view_layer.objects.active = bpy.data.objects[meshes_sel_name[0]]
+        self.report({'INFO'}, 'remove completed')
+        return {'FINISHED'}
+
+
+class ButtonUnifyUVs(bpy.types.Operator):
+    bl_idname = "meshops.unify_uvs"
+    bl_label = "unify UVs"
+    bl_description = "合并选中物体的UV通道\n此操作将删除多余的UV通道，仅保留第一个UV通道"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        # 检查是否有选中的对象
+        if context.selected_objects:
+            # 遍历所有选中的对象
+            for obj in context.selected_objects:
+                # 如果发现任何一个对象不是网格类型，返回 False
+                if obj.type != "MESH":
+                    return False
+            # 如果所有选中的对象都是网格类型，返回 True
+            return True
+        # 如果没有选中的对象，返回 False
+        return False
+
+    def execute(self, context):
+        meshes_sel_name = sorted([o.name for o in bpy.context.selected_objects if o.type == "MESH"])
+
+        for n in meshes_sel_name:
+            bpy.context.view_layer.objects.active = bpy.data.objects[n]
+            activemesh = bpy.context.active_object
+
+            for i in range(len(activemesh.data.uv_layers)):
+                if i == 0:
+                    activemesh.data.uv_layers[0].name = "UVMap"
+                    continue
+                else:
+                    activemesh.data.uv_layers.active = activemesh.data.uv_layers[len(activemesh.data.uv_layers) - 1]
+                    bpy.ops.mesh.uv_texture_remove()
+                    activemesh.data.uv_layers[0].name = "UVMap"
+
+        bpy.context.view_layer.objects.active = bpy.data.objects[meshes_sel_name[0]]
+        self.report({'INFO'}, 'unify completed')
+        return {'FINISHED'}
+
 
 # Inspired by SilentNightSound#7430
 # Combines vertex groups with the same prefix into one
@@ -421,6 +566,8 @@ def is_xray_enabled():
 def split_faces_by_edge_seams(obj):  # Split mesh faces by seams
     utils_set_mode("EDIT")
     bpy.ops.mesh.select_all(action="SELECT")
+    # 取消所有之前的缝合边
+    bpy.ops.mesh.mark_seam(clear=True)
 
     bpy.ops.uv.select_all(action="SELECT")  # Select all UVs
     bpy.ops.uv.seams_from_islands(
@@ -488,6 +635,9 @@ def utils_limit_and_normalize_weights(mesh, limitValue):
 
 
 classes = [
+    ButtonRemoveShapeKeys,
+    ButtonUnifyUVs,
+    ButtonCleanZeroVG,
     ButtonRemoveEmpty,
     ButtonRemoveUnusedBones,
     ButtonSplitMeshAlongUVs,
