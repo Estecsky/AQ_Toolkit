@@ -98,6 +98,11 @@ def drawAQ_3DViewPanel(layout):
     row = box.row()
     row.scale_y = 1.4
     row.operator(
+        "meshops.remove_all_uvs", icon="UV", text="删除所有UV通道"
+    )
+    row = box.row()
+    row.scale_y = 1.4
+    row.operator(
         "misremove_unused.ops_bones", icon="BONE_DATA", text="选择未使用的骨骼"
     )
     row.prop(props, "SelectAndRemove_bone", text="", icon="TRASH")

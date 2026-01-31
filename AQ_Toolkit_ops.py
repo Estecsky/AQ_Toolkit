@@ -471,7 +471,38 @@ class ButtonUnifyUVs(bpy.types.Operator):
         bpy.context.view_layer.objects.active = bpy.data.objects[meshes_sel_name[0]]
         self.report({'INFO'}, 'unify completed')
         return {'FINISHED'}
+    
+class ButtonRemoveAllUVs(bpy.types.Operator):
+    bl_idname = "meshops.remove_all_uvs"
+    bl_label = "remove all UVs"
+    bl_description = "删除选中物体的所有UV通道"
+    bl_options = {'REGISTER', 'UNDO'}
 
+    @classmethod
+    def poll(cls, context):
+        # 检查是否有选中的对象
+        if context.selected_objects:
+            # 遍历所有选中的对象
+            for obj in context.selected_objects:
+                # 如果发现任何一个对象不是网格类型，返回 False
+                if obj.type != "MESH":
+                    return False
+            # 如果所有选中的对象都是网格类型，返回 True
+            return True
+        # 如果没有选中的对象，返回 False
+        return False
+    def execute(self, context):
+        meshes_sel_name = sorted([o.name for o in bpy.context.selected_objects if o.type == "MESH"])
+        for n in meshes_sel_name:
+            bpy.context.view_layer.objects.active = bpy.data.objects[n]
+            obj = bpy.context.active_object
+            uv_layers_count = len(obj.data.uv_layers)
+            for i in range(uv_layers_count):
+                obj.data.uv_layers.active = obj.data.uv_layers[len(obj.data.uv_layers) - 1]
+                bpy.ops.mesh.uv_texture_remove()
+        bpy.context.view_layer.objects.active = bpy.data.objects[meshes_sel_name[0]]
+        self.report({'INFO'}, 'remove completed')
+        return {'FINISHED'}
 
 # Inspired by SilentNightSound#7430
 # Combines vertex groups with the same prefix into one
@@ -673,6 +704,7 @@ classes = [
     ButtonRemoveEmpty,
     ButtonRemoveUnusedBones,
     ButtonSplitMeshAlongUVs,
+    ButtonRemoveAllUVs,
     ButtonDeleteLooseGeometry,
     ButtonSelect0WeightVertices,
     ButtonLimitAndNormalizeAllWeights,
