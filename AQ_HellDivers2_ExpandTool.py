@@ -1,5 +1,5 @@
 import bpy
-
+import os
 
 # =======================
 # HellDivers2 ExpandTool可选组件
@@ -76,19 +76,74 @@ class ButtonDeleteMutilationMesh(bpy.types.Operator):
 
         return {"FINISHED"}
 
+class ButtonImportAvaterHelldiverRig(bpy.types.Operator):
+    bl_idname = "object.import_avatar_helldiver_rig"
+    bl_label = "导入Helldiver2角色通用绑定"
+    bl_description = "导入Helldiver2角色通用绑定骨架"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        
+        skeleton_name = "5556372446766824087_rig"
+        dir_path = os.path.dirname(__file__)
+        rig_file_path = os.path.join(dir_path,"AvaterHelldiverRig","avater_helldiver_rig.blend")
+        #检查文件是否存在
+        if not os.path.exists(rig_file_path):
+            self.report({"ERROR"}, f"骨架文件: {rig_file_path} 不存在")
+            return {"CANCELLED"}
+        # 使用 bpy.ops.wm.append() 函数从.blend文件追加到场景中
+        bpy.ops.wm.append(
+            filepath=os.path.join(rig_file_path, "Object", skeleton_name),
+            directory=os.path.join(rig_file_path, "Object"),
+            filename=skeleton_name,
+        )
+        # 获取追加的物体
+        appended_object = bpy.context.selected_objects[0] if bpy.context.selected_objects else None
+        if appended_object:
+        # 高亮物体
+            bpy.ops.object.select_all(action="DESELECT")
+            appended_object.select_set(True)
+            bpy.context.view_layer.objects.active = appended_object 
+            # =======================
+            if bpy.context.scene.AQ_Props.AvaterHelldiverNewCollection:
+                # 创建新集合
+                collection_name = "Avater_Helldiver_Rig"
+                if collection_name in bpy.data.collections:
+                    new_collection = bpy.data.collections[collection_name]
+                else:
+                    new_collection = bpy.data.collections.new(collection_name)
+                    bpy.context.scene.collection.children.link(new_collection)
+                  # 将物体放入新集合
+                if appended_object.name in bpy.context.collection.objects:
+                    bpy.context.collection.objects.unlink(appended_object)
+                new_collection.objects.link(appended_object)
+        
+        
+        
+        self.report({"INFO"}, "已导入通用绑定骨架")
+        return {"FINISHED"}
+
 
 def ExpandPanel(layout):
+    props = bpy.context.scene.AQ_Props
     row = layout.row()
     row.scale_y = 0.5
     row.label(text="HellDivers2 拓展组件", icon="TOOL_SETTINGS")
     row = layout.row()
     row.scale_y = 1.3
     row.operator("object.delete_mutilation_mesh", text="删除断肢网格", icon="MESH_DATA")
-
+    row = layout.row()
+    row.scale_y = 1
+    row.prop(props, "AvaterHelldiverNewCollection", text="导入时创建新集合")
+    row = layout.row()
+    row.scale_y = 1.5
+    row.operator("object.import_avatar_helldiver_rig", text="导入Helldiver2角色通用绑定", icon="IMPORT")
 
 def register():
     bpy.utils.register_class(ButtonDeleteMutilationMesh)
+    bpy.utils.register_class(ButtonImportAvaterHelldiverRig)
 
 
 def unregister():
     bpy.utils.unregister_class(ButtonDeleteMutilationMesh)
+    bpy.utils.unregister_class(ButtonImportAvaterHelldiverRig)

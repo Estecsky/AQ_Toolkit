@@ -61,6 +61,13 @@ class AQ_CusProperty(bpy.types.PropertyGroup):
         default=True,
     )
     #--------------------
+    # HellDivers2 ExpandTool 组件
+    AvaterHelldiverNewCollection: BoolProperty(
+        name="AvaterHelldiverNewCollection",
+        description="导入时创建新集合",
+        default=True,
+    )
+    #--------------------
     
     BoneSnapPanel : BoolProperty(default=False)  # type: ignore
     MHWilds_Fix_Bones : BoolProperty(default=False,description="只有对于荒野骨骼才有的修正应该开启此项")  # type: ignore
