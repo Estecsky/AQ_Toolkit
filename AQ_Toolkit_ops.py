@@ -300,12 +300,12 @@ class ButtonLimitAndNormalizeAllWeights(bpy.types.Operator):
         )
 
     def execute(self, context):
-        limitValue = bpy.context.scene.AQ_props.AQ_limitWeightValue
+        limitValue = bpy.context.scene.AQ_Props.AQ_limitWeightValue
         try:
             mesh = context.active_object
             utils_limit_and_normalize_weights(mesh, limitValue)
             self.report(
-                {"INFO"}, f"Weights normalized and limited to 4 groups per vetex."
+                {"INFO"}, f"Weights normalized and limited to {limitValue} groups per vetex."
             )
         except Exception as err:
             print(f"{err}")
