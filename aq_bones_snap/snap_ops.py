@@ -23,6 +23,8 @@ class ButtonSignSnapArmature(bpy.types.Operator):
     def poll(cls, context):
         if len(context.selected_objects) > 1:
             return False
+        if context.active_object is None:
+            return False
         return context.active_object.type == 'ARMATURE'
     
     def execute(self, context):
