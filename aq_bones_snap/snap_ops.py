@@ -87,7 +87,7 @@ class ButtonBoneSnap(bpy.types.Operator):
             importlib.reload(preset_module)
             
         fixed_name_list = preset_module.snap_bone_fixed_name_list
-        rename_name_list = preset_module.rename_vg_fixed_name_list
+        # rename_name_list = preset_module.rename_vg_fixed_name_list
         
         
         
@@ -120,61 +120,62 @@ class ButtonBoneSnap(bpy.types.Operator):
                 self.report({"ERROR"}, "选择的骨架没有同时包含吸附骨架和目标骨架")
                 return {'CANCELLED'}
             else:
+                #暂时移除安全检查，用户不一定会写满前六个
                 #获取并保存复制骨架中所有骨骼的名称
-                name_target = [bone.name for bone in armature_target.data.bones]
+                # name_target = [bone.name for bone in armature_target.data.bones]
                 #用字典中的几个骨骼名来判定选择的字典是否匹配当前选中的外部骨架
-                if rename_name_list[0][0] in name_target and rename_name_list[1][0] in name_target and rename_name_list[2][0] in name_target and rename_name_list[4][0] in name_target and rename_name_list[5][0] in name_target:
-                    #复制一个外部骨架对象出来用于吸附
-                    armature_target_copy = armature_target.copy()
-                    armature_target_copy.data = armature_target.data.copy()
-                    armature_target_copy.name = f"{armature_target.name}_copy"
-                    bpy.context.collection.objects.link(armature_target_copy)
+                # if rename_name_list[0][0] in name_target and rename_name_list[1][0] in name_target and rename_name_list[2][0] in name_target and rename_name_list[4][0] in name_target:
+                #复制一个外部骨架对象出来用于吸附
+                armature_target_copy = armature_target.copy()
+                armature_target_copy.data = armature_target.data.copy()
+                armature_target_copy.name = f"{armature_target.name}_copy"
+                bpy.context.collection.objects.link(armature_target_copy)
 
-                    #激活并选中MHWilds骨架，然后与复制的外部骨架合并在一起
-                    bpy.context.view_layer.objects.active = armature_snap
-                    bones = bpy.context.active_object.data.bones
-                    name_ori = [bone.name for bone in bones]
-                    bpy.ops.object.select_all(action='DESELECT')
-                    armature_target_copy.select_set(True)
-                    armature_snap.select_set(True)
-                    bpy.ops.object.join()
+                #激活并选中MHWilds骨架，然后与复制的外部骨架合并在一起
+                bpy.context.view_layer.objects.active = armature_snap
+                bones = bpy.context.active_object.data.bones
+                name_ori = [bone.name for bone in bones]
+                bpy.ops.object.select_all(action='DESELECT')
+                armature_target_copy.select_set(True)
+                armature_snap.select_set(True)
+                bpy.ops.object.join()
 
-                    #获取并保存合并后骨架中所有骨骼的名称
-                    ArmatureName = bpy.context.active_object.data.name
-                    bones = bpy.context.active_object.data.bones
-                    name_in = [bone.name for bone in bones]
+                #获取并保存合并后骨架中所有骨骼的名称
+                ArmatureName = bpy.context.active_object.data.name
+                bones = bpy.context.active_object.data.bones
+                name_in = [bone.name for bone in bones]
 
-                    bpy.ops.object.mode_set(mode='EDIT')
-                    for bone_name in fixed_name_list:
-                        bone1_name, bone2_name = bone_name
-                        #仅当字典中的两列骨骼名都存在于合并后的骨架中时才进行吸附操作
-                        if bone1_name in name_in and bone2_name in name_in:
-                            bpy.data.armatures[ArmatureName].edit_bones.active = bpy.data.armatures[ArmatureName].edit_bones[
-                                bone1_name]
-                            bpy.context.object.data.use_mirror_x = False
-                            bpy.ops.armature.select_all(action='DESELECT')
-                            bpy.ops.object.select_pattern(pattern=bone1_name, case_sensitive=False, extend=True)
-                            bpy.ops.object.select_pattern(pattern=bone2_name, case_sensitive=False, extend=True)
-                            bpy.context.area.type = 'VIEW_3D'
-                            bpy.ops.view3d.snap_selected_to_active()
-                            # bpy.context.area.type = 'TEXT_EDITOR'
-                            bpy.ops.armature.select_all(action='DESELECT')
-                    # 为MHWILDS 修正骨骼
-                    if bpy.context.scene.AQ_Props.MHWilds_Fix_Bones:
-                        MHWilds_fixed_bones.MHWidls_fixed_bones_fun(name_in = name_in,ArmatureName = ArmatureName)
+                bpy.ops.object.mode_set(mode='EDIT')
+                for bone_name in fixed_name_list:
+                    bone1_name, bone2_name = bone_name
+                    #仅当字典中的两列骨骼名都存在于合并后的骨架中时才进行吸附操作
+                    if bone1_name in name_in and bone2_name in name_in:
+                        bpy.data.armatures[ArmatureName].edit_bones.active = bpy.data.armatures[ArmatureName].edit_bones[
+                            bone1_name]
+                        bpy.context.object.data.use_mirror_x = False
+                        bpy.ops.armature.select_all(action='DESELECT')
+                        bpy.ops.object.select_pattern(pattern=bone1_name, case_sensitive=False, extend=True)
+                        bpy.ops.object.select_pattern(pattern=bone2_name, case_sensitive=False, extend=True)
+                        bpy.context.area.type = 'VIEW_3D'
+                        bpy.ops.view3d.snap_selected_to_active()
+                        # bpy.context.area.type = 'TEXT_EDITOR'
+                        bpy.ops.armature.select_all(action='DESELECT')
+                # 如果需要，为MHWILDS 修正骨骼，但其他游戏不需要该操作
+                if bpy.context.scene.AQ_Props.MHWilds_Fix_Bones:
+                    MHWilds_fixed_bones.MHWidls_fixed_bones_fun(name_in = name_in,ArmatureName = ArmatureName)
 
-                    for bone_name in name_in:
-                        if bone_name not in name_ori:
-                            bpy.data.armatures[ArmatureName].edit_bones.active = bpy.data.armatures[ArmatureName].edit_bones[bone_name]
-                            bpy.ops.armature.delete()
-        
-                    bpy.ops.object.mode_set(mode='OBJECT')
+                for bone_name in name_in:
+                    if bone_name not in name_ori:
+                        bpy.data.armatures[ArmatureName].edit_bones.active = bpy.data.armatures[ArmatureName].edit_bones[bone_name]
+                        bpy.ops.armature.delete()
+    
+                bpy.ops.object.mode_set(mode='OBJECT')
                 #若选择的字典不匹配当前选中的外部骨架，则报错
-                else:
+                # else:
                     # showErrorMessageBox(
                     #     "The selected dictionary may not match the currently selected external skeleton. Please select the correct dictionary.")
-                    self.report({'ERROR'}, "The selected dictionary may not match the currently selected external skeleton. Please select the correct dictionary.")
-                    return {'CANCELLED'}
+                    # self.report({'ERROR'}, "The selected dictionary may not match the currently selected external skeleton. Please select the correct dictionary.")
+                    # return {'CANCELLED'}
         
         
         self.report({'INFO'}, "吸附完成")
