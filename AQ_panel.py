@@ -103,6 +103,11 @@ def drawAQ_3DViewPanel(layout):
     row = box.row()
     row.scale_y = 1.4
     row.operator(
+        "model.remove_unused_material_slot", icon="MATERIAL_DATA", text="清理未使用的材质槽"
+    )
+    row = box.row()
+    row.scale_y = 1.4
+    row.operator(
         "misremove_unused.ops_bones", icon="BONE_DATA", text="选择未使用的骨骼"
     )
     row.prop(props, "SelectAndRemove_bone", text="", icon="TRASH")

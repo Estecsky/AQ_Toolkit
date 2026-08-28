@@ -580,6 +580,24 @@ class ButtonImportFaceOptimizeTemplate(bpy.types.Operator):
 
         return{"FINISHED"}
 
+class ButtonRemoveUnusedMaterialSlot(bpy.types.Operator):
+    bl_idname = "model.remove_unused_material_slot"
+    bl_label = "remove_unused_material_slot"
+    bl_description = "清理选中物体的未使用的材质槽(可多选)"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        return context.selected_objects
+    def execute(self, context):            
+        selected_meshes = [o for o in context.selected_objects if o.type == "MESH"]
+        count = 0
+        for obj in selected_meshes:
+            with context.temp_override(object=obj):
+                bpy.ops.object.material_slot_remove_unused()
+            count +=1
+        self.report({"INFO"}, f"已清理 {count} 个网格")
+        return {"FINISHED"}      
 
 # ----------Utils----------#
 
@@ -711,6 +729,7 @@ classes = [
     ButtonSelectSeams,
     ButtonCombineVertexGroups,
     ButtonImportFaceOptimizeTemplate,
+    ButtonRemoveUnusedMaterialSlot,
 ]
 
 
