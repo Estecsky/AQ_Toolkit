@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import StringProperty, IntProperty, BoolProperty,EnumProperty
 from .aq_bones_snap.reload_presets import reloadPresets
+from .AQ_HellDivers2_ExpandTool import reload_armor_dict, reload_armor_dict_single
 
 class AQ_CusProperty(bpy.types.PropertyGroup):
 
@@ -67,6 +68,43 @@ class AQ_CusProperty(bpy.types.PropertyGroup):
         description="导入时创建新集合",
         default=True,
     )
+    
+    IgnoreBodyType: BoolProperty(
+        name="IgnoreBodyType",
+        description="忽略体型区分",
+        default=True,
+    )
+    
+    IgnoreArmorIDReuse: BoolProperty(
+        name="IgnoreArmorIDReuse",
+        description="忽略护甲污染，开启后将显示单独护甲选单",
+        default=False,
+    )
+    
+    ClearPreviousSwapID: BoolProperty(
+        name="ClearPreviousSwapID",
+        description="清除先前已存在的转移属性",
+        default=True,
+    )
+    
+    def getSwapIDTargetList(self, context):
+        return reload_armor_dict()
+    
+    SwapIDTargetList: EnumProperty(
+    name = "",
+    description = "",
+    items = getSwapIDTargetList
+    )
+    
+    def getSwapIDTargetList_single(self, context):
+        return reload_armor_dict_single()
+    
+    SwapIDTargetList_single: EnumProperty(
+    name = "",
+    description = "",
+    items = getSwapIDTargetList_single
+    )
+    
     #--------------------
     
     BoneSnapPanel : BoolProperty(default=False)  # type: ignore
